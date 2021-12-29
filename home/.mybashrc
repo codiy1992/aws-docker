@@ -1,0 +1,18 @@
+#!/bin/bash
+
+alias play='ansible-playbook'
+alias vault='ansible-vault'
+
+function ec2() {
+    if [ "$1" == "" ] || [ "$1" == "list" ] || [ "$1" == "all" ]; then
+        aws ec2 describe-instances --filters Name=instance-state-name,Values="running" \
+        --query "Reservations[].Instances[].[InstanceId, PublicIpAddress, InstanceType, PrivateIpAddress, Tags[?Key=='Name'].Value]" \
+        --output text | sed 'N;s/\n/\t/g';
+    else
+        aws ec2 describe-instances --filters Name=instance-state-name,Values="running" \
+        Name=tag:Env,Values="$1" \
+        --query "Reservations[].Instances[].[InstanceId, PublicIpAddress, InstanceType, PrivateIpAddress, Tags[?Key=='Name'].Value]" \
+        --output text | sed 'N;s/\n/\t/g';
+    fi
+}
+function ssm() { aws ssm start-session --target "$1"; }

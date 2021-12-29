@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  devops:
+    image: devops
+    build: ./
+    container_name: devops
+    network_mode: host
+    volumes:
+        - ./work:/work
+        - ~/.ssh:/home/work/.ssh
+        - ~/.aws:/home/work/.aws
+        - ./home/.local:/home/work/.local
+        - ./home/.boto:/home/work/.boto
+        - ./home/.bashrc:/home/work/.bashrc
+        - ./home/.mybashrc:/home/work/.mybashrc
+    privileged: true

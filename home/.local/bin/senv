@@ -1,0 +1,10 @@
+# set env
+if [ ! $# == 2 ]; then
+  $(awk -F ' *= *' -v PROFILE="$1" -f ~/.local/.aws.awk ~/.aws/config ~/.aws/credentials);
+  /bin/bash --rcfile <(cat ~/.bashrc; echo "PS1='$1@${AWS_DEFAULT_REGION}:\w# '";) -i
+fi
+if [ ! $# == 3 ] && ([ "$1" == "--region" ] || [ "$1" == "-r" ]); then
+  /bin/bash --rcfile <(cat ~/.bashrc; echo "export AWS_DEFAULT_REGION=$2"; echo "PS1='${AWS_DEFAULT_PROFILE}@$2:\w# '";) -i
+fi
+# clean ansible cache
+rm -fr ~/.ansible/tmp/*
