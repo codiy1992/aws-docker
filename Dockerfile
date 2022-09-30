@@ -28,7 +28,8 @@ RUN pip install ansible
 RUN pip install boto3
 
 # install session manager plugin
-RUN curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb"
+RUN arch=$(arch | sed s/aarch64/arm64/ | sed s/x86_64/64bit/) && \
+    curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_${arch}/session-manager-plugin.deb" -o "session-manager-plugin.deb"
 RUN dpkg -i session-manager-plugin.deb
 
 # Install yarn
