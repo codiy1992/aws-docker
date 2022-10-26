@@ -1,49 +1,52 @@
-FROM python:latest
+FROM golang:1.17-alpine as ssm-builder
+
+# @link https://github.com/aws/session-manager-plugin/releases
+ARG VERSION=1.2.398.0
+RUN set -ex && apk add --no-cache make git gcc libc-dev curl bash zip && \
+    curl -sLO https://github.com/aws/session-manager-plugin/archive/${VERSION}.tar.gz && \
+    mkdir -p /go/src/github.com && \
+    tar xzf ${VERSION}.tar.gz && \
+    mv session-manager-plugin-${VERSION} /go/src/github.com/session-manager-plugin && \
+    cd /go/src/github.com/session-manager-plugin && \
+    make release
+
+FROM alpine:latest
+
+LABEL Author=codiy \
+      Mail=mail@codiy.net
+
+ENV LC_ALL=en_US.UTF-8
+
 USER root
 
-RUN apt-get update
-
-RUN apt-get install -y groff less vim git sudo dnsutils
-
-# add work user
-RUN mkdir /home/work
-
-RUN useradd -d /home/work work
+RUN addgroup -S work && adduser -S work -G work -h /home/work
 
 RUN echo 'work   ALL=(ALL)    NOPASSWD:ALL' >> /etc/sudoers
-
-# Remove default python2, use python3 instead
-RUN rm -fr /usr/bin/python
-RUN ln -sf /usr/local/bin/python /usr/bin/python
-
-# install pip3 and requirements
-RUN wget https://bootstrap.pypa.io/get-pip.py
-
-RUN python get-pip.py
-
-RUN pip install awscli
-
-RUN pip install ansible
-
-RUN pip install boto3
-
-# install session manager plugin
-RUN arch=$(arch | sed s/aarch64/arm64/ | sed s/x86_64/64bit/) && \
-    curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_${arch}/session-manager-plugin.deb" -o "session-manager-plugin.deb"
-RUN dpkg -i session-manager-plugin.deb
-
-# Install yarn
-RUN curl -fsSL https://deb.nodesource.com/setup_14.x | bash -
-RUN apt-get install -y nodejs
-RUN npm install -g yarn
-
-# Vim Configuration
-RUN wget -O /home/work/.vimrc https://raw.githubusercontent.com/amix/vimrc/master/vimrcs/basic.vim && \
-    chown work.work /home/work/.vimrc
 
 RUN mkdir -p /work
 
 RUN chown -R work.work /home/work
 
+RUN apk update && apk add --no-cache \
+        vim \
+        bash \
+        less \
+        sudo \
+        curl \
+        groff \
+        gnupg \
+        python3 \
+        py3-pip \
+        bind-tools \
+        ca-certificates \
+        openssh-client
+
+RUN pip install awscli ansible boto3
+
+# session manager
+ARG TARGETARCH
+COPY --from=ssm-builder /go/src/github.com/session-manager-plugin/bin/linux_${TARGETARCH}_plugin/session-manager-plugin /usr/bin/
+
 USER work
+
 WORKDIR /work

@@ -1,10 +1,10 @@
 version: '3'
 
 services:
-  devops:
-    image: devops
+  awsm:
+    image: awsm
     build: ./
-    container_name: devops
+    container_name: awsm
     network_mode: host
     volumes:
         - ./work:/work
@@ -12,6 +12,7 @@ services:
         - ~/.aws:/home/work/.aws
         - ./home/.local:/home/work/.local
         - ./home/.boto:/home/work/.boto
+        - ./home/.vimrc:/home/work/.vimrc
         - ./home/.bashrc:/home/work/.bashrc
         - ./home/.mybashrc:/home/work/.mybashrc
     privileged: true
