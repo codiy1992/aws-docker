@@ -16,16 +16,6 @@ ENV LC_ALL=en_US.UTF-8
 
 USER root
 
-ARG PUID=1000
-ARG PGID=1000
-RUN addgroup -g ${PGID} -S work && adduser -u ${PUID} -S work -G work -h /home/work
-
-RUN echo 'work   ALL=(ALL)    NOPASSWD:ALL' >> /etc/sudoers
-
-RUN mkdir -p /work
-
-RUN chown -R work.work /home/work
-
 RUN apk update && apk add --no-cache \
         gcc \
         vim \
@@ -49,6 +39,16 @@ RUN pip install awscli ansible boto3
 # session manager
 ARG TARGETARCH
 COPY --from=ssm-builder /go/src/github.com/session-manager-plugin/bin/linux_${TARGETARCH}_plugin/session-manager-plugin /usr/bin/
+
+ARG PUID=1000
+ARG PGID=1000
+RUN addgroup -g ${PGID} -S work && adduser -u ${PUID} -S work -G work -h /home/work
+
+RUN echo 'work   ALL=(ALL)    NOPASSWD:ALL' >> /etc/sudoers
+
+RUN mkdir -p /work
+
+RUN chown -R work.work /home/work
 
 USER work
 
