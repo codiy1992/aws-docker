@@ -25,6 +25,7 @@ RUN mkdir -p /work
 RUN chown -R work.work /home/work
 
 RUN apk update && apk add --no-cache \
+        gcc \
         vim \
         bash \
         less \
