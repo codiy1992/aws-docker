@@ -16,7 +16,9 @@ ENV LC_ALL=en_US.UTF-8
 
 USER root
 
-RUN addgroup -S work && adduser -S work -G work -h /home/work
+ARG PUID=1000
+ARG PGID=1000
+RUN addgroup -g ${PGID} -S work && adduser -u ${PUID} -S work -G work -h /home/work
 
 RUN echo 'work   ALL=(ALL)    NOPASSWD:ALL' >> /etc/sudoers
 
