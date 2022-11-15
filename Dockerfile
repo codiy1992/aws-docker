@@ -36,6 +36,7 @@ RUN apk update && apk add --no-cache \
         python3 \
         py3-pip \
         musl-dev \
+        libffi-dev \
         python3-dev \
         bind-tools \
         ca-certificates \
