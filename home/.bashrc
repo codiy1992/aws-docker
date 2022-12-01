@@ -16,8 +16,6 @@ alias l='ls $LS_OPTIONS -lA'
 alias rm='rm -i'
 alias cp='cp -i'
 alias mv='mv -i'
-alias vim='/usr/bin/vim.basic'
-alias vi='/usr/bin/vim.basic'
 
 # PATH
 export PATH=~/.local/bin:$PATH
