@@ -5,7 +5,7 @@
 * Add the function below to your `.zshrc` file And Modify `THIS_REPO_LOCATION` to your own location.
 
 ```shell
-fuction ops {
+function ops {
     cd THIS_REPO_LOCATION && make bash PROFILE=${1:-default}
 }
 ```
